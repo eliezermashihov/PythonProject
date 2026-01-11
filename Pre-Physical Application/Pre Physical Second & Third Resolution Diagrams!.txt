@@ -1,0 +1,490 @@
++---------------------------------------------------------------------------------------------------------------------------------------+
+|                                                   AUTOMATED PIPELINE: SOFTWARE PHASE                                                  |
+|                                                                                                                                       |
+|  +---------------------------+       +---------------------------------------------------------------------------------------------+  |
+|  | INPUT SOURCE (Purple)     |       |  STAGE 1: INITIALIZATION & IDENTITY BASELINES                                               |  |
+|  |                           |       |                                                                                             |  |
+|  | CPOINT (Order Data)       |       |  1. BASELINE COMPARISON                                                                     |  |
+|  | -----------------------   |       |     • Tool Type: Must match CPoint 1:1 (Accurate measure)                                   |  |
+|  | Owner: Hen Shimoni        |------>|     • Tool Name & PC Hardware: Verify identity matches tool spec                            |  |
+|  | Data:                     |       |     • OS Check:                                                                             |  |
+|  | • Compatibility Matrix    |       |       -> IF Windows 10: Validate SQL Server Ver >= 14.0.3456.2                              |  |
+|  | • "Notes A / Notes B"     |       |       -> IF Windows 7:  Skip SQL validation                                                 |  |
+|  | • License List (MCDB)     |       |                                                                                             |  |
+|  | • RDM Requirement         |       |  2. RDM (REMOTE DIAGNOSTICS) LOGIC                                                          |  |
+|  +---------------------------+       |     • Logic: If RDM exists in CPoint -> Check for "rdm_ver.txt" on Machine CMD              |  |
+|              |                       |     • Failure: If required by CPoint but missing on machine -> **RAISE TICKET** |  |
+|              |                       |                                                                                             |  |
+|              |                       +---------------------------------------------------------------------------------------------+  |
+|              |                                                      |                                                                 |
+|              |                                                      v                                                                 |
+|              |                       +---------------------------------------------------------------------------------------------+  |
+|              |                       |  STAGE 2: COMPONENT & FIRMWARE DEEP-DIVE                                                    |  |
+|              |                       |                                                                                             |  |
+|              |                       |  [ SOFTWARE: CFP Assistant (Owner: Daniel Biton) ]                                          |  |
+|              |                       |                                                                                             |  |
+|              |                       |  • CFS (Common Film Shape): Must be 1:1 identical (Source: ver.txt / Atlas)                 |  |
+|              |                       |  • ACUSHAPE: Check "C:/AcuShape/version_new.txt" on NLB (Must be 1:1)                       |  |
+|              |                       |  • FTML: Extract & Compare from Atlas Software                                              |  |
+|              |                       |  • NEXUS (Owner: Shechter David): Check KTPatchViewer / Program Files                       |  |
+|              |                       |     -> Validate items: Nexus Client 1, Nexus Client 2, Nexus Server                         |  |
+|              |                       |  • FLEETHUB (Owner: Daniel Biton):                                                          |  |
+|              |                       |     -> 1. Exists?   2. Status is "Running" (Not Disabled/Failed)                            |  |
+|              |                       |  • FIRMWARE (MEC & SMCB):                                                                   |  |
+|              |                       |     -> MEC: Extract after string "MEC FW". Compare "FW RzMP" vs "eXMP"                      |  |
+|              |                       |     -> SMCB: Compare "NIOS" version vs Matrix                                               |  |
+|              |                       |  • NOTES A/B EXTRAS:                                                                        |  |
+|              |                       |     -> Parse "Name + Version" string -> Find on Machine -> Verify != N/A                    |  |
+|              |                       |                                                                                             |  |
+|              +---------------------->+---------------------------------------------------------------------------------------------+  |
+|                                                                     |                                                                 |
+|                                                                     v                                                                 |
+|  +---------------------------+       +---------------------------------------------------------------------------------------------+  |
+|  | MACHINE DATA (Purple)     |       |  STAGE 3: LICENSE MANAGEMENT ENGINE                                                         |  |
+|  |                           |       |                                                                                             |  |
+|  | CONNECTIVITY              |       |  [ DATA PREP ]                                                                              |  |
+|  | -----------------------   |       |  • Source: MCDB (Order) vs Search *.ktlic files on C: Drive (Machine)                       |  |
+|  | • Auto Remote App         |------>|  • Tool: Igor Miliavski's license validator                                                 |  |
+|  | • CMD Access              |       |  • Logic: Unpack "Packages" (e.g. FDC) into detailed lists before comparing                 |  |
+|  |                           |       |                                                                                             |  |
+|  | FILES ACCESSED:           |       |  [ VALIDATION LOGIC ]                                                                       |  |
+|  | • C:/ver.txt              |       |                                                                                             |  |
+|  | • C:/Atlas_...            |       |  +---[ CASE 1: OVERFLOW ]---------------------------------------------------------------+   |  |
+|  | • C:/Program Files        |       |  | Scenario: License exists on Machine, but NOT in CPoint.                                |   |  |
+|  | • C:/AcuShape/            |       |  | Check: Is it a Demo License?                                                           |   |  |
+|  | • .ktlic search           |       |  | Action: REMOVE LICENSE (or advise removal).                                            |   |  |
+|  +---------------------------+       |  +--------------------------------------------------------------------------------------+   |  |
+|                                      |                                                                                             |  |
+|                                      |  +---[ CASE 2: MISSING ]----------------------------------------------------------------+   |  |
+|                                      |  | Scenario: License in CPoint, but NOT on Machine.                                     |   |  |
+|                                      |  | ACTION: TRIGGER EMAIL FEATURE                                                        |   |  |
+|                                      |  | -> To: Ronen Golan, Alin Fimlnik, Raz Ben Nasan                                      |   |  |
+|                                      |  | -> Data: UTID, Customer, Tool Type, MAC, SW Version                                  |   |  |
+|                                      |  | -> Attach: "lmtool.txt" or "lmutil.txt"                                              |   |  |
+|                                      |  | -> Post-Fix: Manual Install -> Re-run Validation                                     |   |  |
+|                                      |  +--------------------------------------------------------------------------------------+   |  |
+|                                      +---------------------------------------------------------------------------------------------+  |
+|                                                                                                                                       |
++---------------------------------------------------------------------------------------------------------------------------------------+
+                                                                  |
+                                                                  v
+                                              +-------------------------------------------+
+                                              | GENERATE DETAILED REPORT (Purple)         |
+                                              |                                           |
+                                              | • List of Passed Checks (Green)           |
+                                              | • List of Failed Checks (Red)             |
+                                              | • Measurements & Photos                   |
+                                              | • Generated Tickets (RDM/Missing Lics)    |
+                                              +-------------------------------------------+
+
+
+
+
+
+
+
+
++-------------------------------------------------------------------------------------------------------+
+|                                    INPUT SOURCE EXPANSION (ZOOM IN)                                   |
++-------------------------------------------------------------------------------------------------------+
+
+                                          (Logical Flow)
+          [ CPOINT DATABASE ]  ----------------------------------->  [ AUTOMATED PIPELINE ]  <-----------------------------------  [ MACHINE / TOOL ]
+
++=======================================================+       +=======================================================+
+|  SOURCE A: CPOINT (THE "ORDER" DATA)                  |       |  SOURCE B: MACHINE CONFIGURATION (LIVE DATA)          |
++=======================================================+       +=======================================================+
+|  "The Single Source of Truth"                         |       |  "The Physical Reality"                               |
+|                                                       |       |                                                       |
+|  [ META DATA ]                                        |       |  [ CONNECTION METHOD ]                                |
+|  • Owner/Architect: Hen Shimoni (חן שמעוני)           |       |  • Primary Tool: Auto Remote App                      |
+|  • Location: "Adi's Computer" / Network DB            |       |    (Allows access to folders without full GUI login)  |
+|                                                       |       |  • Fallback: CMD / Script access                      |
+|  [ CORE DATA BLOCKS ]                                 |       |                                                       |
+|  1. THE COMPATIBILITY MATRIX                          |       |  [ FILE SYSTEM EXTRACTION POINTS ]                    |
+|     (The Golden Standard)                             |       |                                                       |
+|     • Tool Type (Accurate Measure)                    |       |  1. ROOT CONFIGURATION                                |
+|     • Required OS (Win7 vs Win10)                     |       |     • Path: C:\ver.txt                                |
+|     • Firmware Baselines (MEC / SMCB)                 |       |       -> Contains "All versions"                      |
+|                                                       |       |       -> Documented AcuShape version                  |
+|  2. SOFTWARE LISTS                                    |       |       -> CFS Version                                  |
+|     • "Notes A" & "Notes B" fields                    |       |                                                       |
+|       (Strings: "Name + Version")                     |       |  2. COMPONENT SPECIFIC PATHS                          |
+|                                                       |       |     • RDM: C:\...\rdm_ver.txt                         |
+|  3. MCDB (LICENSE DATABASE)                           |       |     • Nexus: C:\Program Files\KTPatchViewer           |
+|     • List of required .ktlic files                   |       |       -> Extract: Client 1, Client 2, Server          |
+|     • "Packages" (e.g., FDC) that need unpacking      |       |     • AcuShape: NLB Drive -> C:\AcuShape\version_new.txt|
+|                                                       |       |     • FTML: Extract from Atlas Software folder        |
+|  4. INDICATORS                                        |       |     • MEC FW: Extract string after "MEC FW" in About  |
+|     • RDM Required? (Yes/No)                          |       |                                                       |
+|     • FleetHub Enrolled?                              |       |  3. LICENSE FILES                                     |
+|                                                       |       |     • Search Pattern: *.ktlic                         |
+|                                                       |       |     • Location: C:\ Drive recursive search            |
+|                                                       |       |     • Validation Tool: Igor Miliavski's Utility       |
++=======================================================+       +=======================================================+
+
+
+
+
+
+
+
+
++----------------------------------------------------------------------------------------------------------------+
+|                          EXPANSION: STAGE 1 - INITIALIZATION & IDENTITY BASELINES                              |
++----------------------------------------------------------------------------------------------------------------+
+
+      [ START STAGE 1 ]
+             |
+             v
++==============================================================================================================+
+|  1. BASELINE COMPARISON (THE "IDENTITY" CHECK)                                                               |
+|     "Is the machine configured correctly before we check the software?"                                      |
++==============================================================================================================+
+|                                                                                                              |
+|  [ A. TOOL IDENTITY ]                                                                                        |
+|    • SOURCE CPOINT: Get "Tool Type" (The Accurate Measure)                                                   |
+|    • SOURCE MACHINE: Get Tool Type from Config                                                               |
+|    • LOGIC: MUST MATCH 1:1.                                                                                  |
+|       -> If Mismatch: CRITICAL FAIL (Stop or Flag immediately).                                              |
+|                                                                                                              |
+|  [ B. PC HARDWARE IDENTITY ]                                                                                 |
+|    • GOAL: Verify the PC itself is identical to the tool definition.                                         |
+|    • CHECK: "PC - has to be identical to the tool itself"                                                    |
+|                                                                                                              |
+|  [ C. OPERATING SYSTEM FORK ]                                                                                |
+|    • CHECK: Detect OS Version on Machine.                                                                    |
+|                                                                                                              |
+|    +--- CASE: WINDOWS 10 ---------------------------------------------------------------------------------+  |
+|    |    • Requirement: Mandatory SQL Validation.                                                          |  |
+|    |    • ACTION: Check SQL Server Version.                                                               |  |
+|    |    • CRITERIA: Version must be >= 14.0.3456.2                                                        |  |
+|    |      (Consult "procedure in the folder" for automation method)                                       |  |
+|    +------------------------------------------------------------------------------------------------------+  |
+|                                                                                                              |
+|    +--- CASE: WINDOWS 7 ----------------------------------------------------------------------------------+  |
+|    |    • ACTION: SKIP SQL Validation.                                                                    |  |
+|    |    • REASON: SQL check is not relevant for Win7 tools.                                               |  |
+|    +------------------------------------------------------------------------------------------------------+  |
+|                                                                                                              |
++==============================================================================================================+
+             |
+             v
++==============================================================================================================+
+|  2. RDM (REMOTE DIAGNOSTICS) LOGIC                                                                           |
+|     "Verify the diagnostics link exists if the order requires it."                                           |
++==============================================================================================================+
+|                                                                                                              |
+|  [ STEP A: CHECK CPOINT REQUIREMENT ]                                                                        |
+|    • QUESTION: Does CPoint list "RDM" or "Indicator" as required?                                            |
+|                                                                                                              |
+|    +--- NO (Not Required) --------------------------------------------------------------------------------+  |
+|    |    • ACTION: Proceed to next stage. (Nothing to check).                                              |  |
+|    +------------------------------------------------------------------------------------------------------+  |
+|                                                                                                              |
+|    +--- YES (Required) -----------------------------------------------------------------------------------+  |
+|    |    • ACTION: Search for verification file on Machine.                                                |  |
+|    |    • TARGET FILE: "rdm_ver.txt"                                                                      |  |
+|    |    • METHOD: CMD access (Command Line)                                                               |  |
+|    |                                                                                                      |
+|    |    [ SUB-LOGIC: VALIDATION RESULT ]                                                                  |
+|    |      • FOUND?  -> [ PASS ] RDM confirmed.                                                            |  |
+|    |      • MISSING? -> [ FAIL ]                                                                          |  |
+|    |        -> CRITICAL ACTION: RAISE TICKET FOR ISSUE.                                                   |  |
+|    |        (Note: "If rdm in CPoint and no rdm in tool -> Rise ticket")                                  |  |
+|    +------------------------------------------------------------------------------------------------------+  |
+|                                                                                                              |
++==============================================================================================================+
+             |
+             v
+      [ END STAGE 1 -> PROCEED TO SOFTWARE COMPONENTS ]
+
+
+
+
+
++-------------------------------------------------------------------------------------------------------------------------+
+|                               EXPANSION: STAGE 2 - COMPONENT & FIRMWARE DEEP-DIVE                                       |
++-------------------------------------------------------------------------------------------------------------------------+
+
+      [ FROM STAGE 1 (Identity Confirmed) ]
+                   |
+                   v
++=======================================================================================================================+
+|  GROUP A: CORE APPLICATION SUITE                                                                                      |
+|  "The primary operational software layers."                                                                           |
++=======================================================================================================================+
+|                                                                                                                       |
+|  [ 1. CFS (Common Film Shape) ]                                                                                       |
+|    • LOGIC: 1:1 Identity Check (Strict Equality).                                                                     |
+|    • SOURCE CPOINT: Matrix / Software List.                                                                           |
+|    • SOURCE MACHINE: Extract from root "ver.txt" OR "Atlas" version field.                                            |
+|                                                                                                                       |
+|  [ 2. ACUSHAPE (The Optical Engine) ]                                                                                 |
+|    • SPECIAL PATH: Documented in main PC `ver.txt`, BUT installed on the NLB unit.                                    |
+|    • VALIDATION TARGET: Network Load Balancer (NLB).                                                                  |
+|    • PATH: C:/AcuShape/version_new.txt                                                                                |
+|    • LOGIC: Compare 1:1 with CPoint Compatibility Matrix.                                                             |
+|                                                                                                                       |
+|  [ 3. FTML ]                                                                                                          |
+|    • SOURCE: Extract internal version from "Atlas" software.                                                          |
+|    • LOGIC: Compare with CPoint.                                                                                      |
+|                                                                                                                       |
+|  [ 4. CFP ASSISTANT ]                                                                                                 |
+|    • OWNER: Daniel Biton                                                                                              |
+|    • LOCATION: "Adi's Computer" (Source definition).                                                                  |
+|    • ACTION: Verify installed version matches Order.                                                                  |
+|                                                                                                                       |
++=======================================================================================================================+
+                   |
+                   v
++=======================================================================================================================+
+|  GROUP B: THE NEXUS ECOSYSTEM                                                                                         |
+|  "Complex multi-part installation validation."                                                                        |
++=======================================================================================================================+
+|  • OWNER: Shechter David (שכטר דוד)                                                                                   |
+|  • DATA SOURCE: "KTPatchViewer" or "Program Files" extraction.                                                        |
+|                                                                                                                       |
+|  [ REQUIRED COMPONENTS ]                                                                                              |
+|    1. Nexus Client 1                                                                                                  |
+|    2. Nexus Client 2                                                                                                  |
+|    3. Nexus Server                                                                                                    |
+|                                                                                                                       |
+|  [ VALIDATION LOGIC ]                                                                                                 |
+|    • Iterate through Program Files.                                                                                   |
+|    • Extract version strings for all 3 items.                                                                         |
+|    • Compare against Order Data.                                                                                      |
++=======================================================================================================================+
+                   |
+                   v
++=======================================================================================================================+
+|  GROUP C: FIRMWARE & INFRASTRUCTURE                                                                                   |
+|  "Low-level control and management utilities."                                                                        |
++=======================================================================================================================+
+|                                                                                                                       |
+|  [ 1. FLEETHUB ]                                                                                                      |
+|    • OWNER: Daniel Biton                                                                                              |
+|    • CHECK 1 (EXISTENCE): Is the software present?                                                                    |
+|    • CHECK 2 (HEALTH): Is it "Running"?                                                                               |
+|       -> Fail Conditions: "Disabled", "Failed", or "Not Enrolled".                                                    |
+|                                                                                                                       |
+|  [ 2. MEC FIRMWARE ]                                                                                                  |
+|    • PARSING RULE: Locate string "MEC FW" in the KLA Software format.                                                 |
+|    • COMPARISON:                                                                                                      |
+|       -> Extract "FW RzMP" version.                                                                                   |
+|       -> Compare against "eXMP" reference in Matrix.                                                                  |
+|                                                                                                                       |
+|  [ 3. SMCB FIRMWARE ]                                                                                                 |
+|    • TARGET: NIOS Version.                                                                                            |
+|    • LOGIC: Compare NIOS version found on machine vs Matrix NIOS Baseline.                                            |
+|                                                                                                                       |
++=======================================================================================================================+
+                   |
+                   v
++=======================================================================================================================+
+|  GROUP D: DYNAMIC "NOTES" PARSER (NOTES A / NOTES B)                                                                  |
+|  "Handling unexpected or custom software requests."                                                                   |
++=======================================================================================================================+
+|                                                                                                                       |
+|  [ INPUT PARSING ]                                                                                                    |
+|    • READ fields "Notes A" and "Notes B" from CPoint.                                                                 |
+|    • FORMAT: Usually written as "Name + Version".                                                                     |
+|                                                                                                                       |
+|  [ DYNAMIC LOOP ]                                                                                                     |
+|    • FOR EACH item found in Notes:                                                                                    |
+|       1. Search for corresponding software on Machine.                                                                |
+|       2. EXTRACT Version.                                                                                             |
+|       3. VALIDATE: Ensure result is NOT "N/A".                                                                        |
+|          (i.e., The software must exist and report a valid version).                                                  |
+|                                                                                                                       |
++=======================================================================================================================+
+                   |
+                   v
+      [ END STAGE 2 -> PROCEED TO LICENSES ]
+
+
+
+
+
+
+
++-------------------------------------------------------------------------------------------------------------------------+
+|                               EXPANSION: STAGE 3 - LICENSE MANAGEMENT ENGINE                                            |
++-------------------------------------------------------------------------------------------------------------------------+
+
+      [ FROM STAGE 2 (Software Validated) ]
+                   |
+                   v
++=======================================================================================================================+
+|  PHASE A: DATA INGESTION & NORMALIZATION                                                                              |
+|  "Gathering the raw data before comparison."                                                                          |
++=======================================================================================================================+
+|                                                                                                                       |
+|  [ 1. SOURCE: THE ORDER (CPOINT) ]                                                                                    |
+|    • FETCH: License list from MCDB (Master Config DB).                                                                |
+|    • PRE-PROCESSING (CRITICAL): "Package Expansion"                                                                   |
+|       -> Logic: If a license is a "Package" (e.g., FDC), it is not a single file.                                     |
+|       -> Action: "Unpack" the name into the list of detailed sub-licenses required.                                   |
+|       -> Result: A flattened list of ALL required license strings.                                                    |
+|                                                                                                                       |
+|  [ 2. SOURCE: THE MACHINE (PHYSICAL) ]                                                                                |
+|    • METHOD: Recursive File Search.                                                                                   |
+|    • PATTERN: "*.ktlic"                                                                                               |
+|    • SCOPE: Entire C:/ Drive (or specific license folders).                                                            |
+|    • UTILITY HELP: Use Igor Miliavski's license validation tool to parse headers/content.                             |
+|    • EXTRACTION: Extract "License Name" & "Tool Number" from inside the files.                                        |
+|                                                                                                                       |
++=======================================================================================================================+
+                   |
+                   v
++=======================================================================================================================+
+|  PHASE B: THE COMPARISON ENGINE                                                                                       |
+|  "Compare Flattened CPoint List vs. Extracted Machine List (1:1)"                                                     |
++=======================================================================================================================+
+|                                                                                                                       |
+|  [ SCENARIO 1: PERFECT MATCH ]                                                                                        |
+|    • LOGIC: License exists in CPoint AND exists on Machine.                                                           |
+|    • STATUS: [ PASS ]                                                                                                 |
+|                                                                                                                       |
+|  [ SCENARIO 2: OVERFLOW (EXTRA FILES) ]                                                                               |
+|    • LOGIC: License found on Machine, but NOT listed in CPoint/MCDB.                                                  |
+|    • ANALYSIS:                                                                                                        |
+|       1. Is it a "Demo License"? (Often left behind by accident).                                                     |
+|       2. Is it a deprecated license?                                                                                  |
+|    • ACTION: REMOVE ON THE SPOT (or flag for immediate manual removal).                                               |
+|    • "If there is overflow in mcdb - REMOVE what is not on CPOINT."                                                   |
+|                                                                                                                       |
+|  [ SCENARIO 3: MISSING (THE "GAP") ]                                                                                  |
+|    • LOGIC: License required by CPoint, but NOT found on Machine.                                                     |
+|    • ACTION: Initiates the "Missing License Protocol" (See Phase C).                                                  |
+|                                                                                                                       |
++=======================================================================================================================+
+                   |
+                   v
++=======================================================================================================================+
+|  PHASE C: THE MISSING LICENSE PROTOCOL (AUTOMATION FEATURE)                                                           |
+|  "The Self-Healing Trigger"                                                                                           |
++=======================================================================================================================+
+|                                                                                                                       |
+|  [ 1. GATHER DIAGNOSTICS ]                                                                                            |
+|    • Generate/Locate the License Manager Logs:                                                                        |
+|       -> Target Files: "lmtool.txt" OR "lmutil.txt"                                                                   |
+|                                                                                                                       |
+|  [ 2. COMPOSE EMAIL BOT ]                                                                                             |
+|    • RECIPIENTS (The "Tribunal"):                                                                                     |
+|       1. Ronen Golan                                                                                                  |
+|       2. Alin Fimlnik                                                                                                 |
+|       3. Raz Ben Nasan                                                                                                |
+|                                                                                                                       |
+|    • SUBJECT: "Missing License Alert - [Tool_ID]"                                                                     |
+|                                                                                                                       |
+|    • BODY CONTENT (Credentials):                                                                                      |
+|       -> UTID                                                                                                         |
+|       -> Customer Name                                                                                                |
+|       -> Tool Type                                                                                                    |
+|       -> MAC Address                                                                                                  |
+|       -> Current SW Version                                                                                           |
+|       -> Name of Missing License(s)                                                                                   |
+|                                                                                                                       |
+|    • ATTACHMENT: The `lmtool.txt` gathered in Step 1.                                                                 |
+|                                                                                                                       |
+|  [ 3. THE RECOVERY LOOP ]                                                                                             |
+|    • WAIT: Human/System provides the valid license file.                                                              |
+|    • INSTALL: "Install Manually" (Place file in correct folder).                                                      |
+|    • LOOP: RE-RUN VALIDATION (Go back to Phase B).                                                                    |
+|                                                                                                                       |
++=======================================================================================================================+
+                   |
+                   v
+      [ END STAGE 3 -> GENERATE FINAL REPORT ]
+
+
+
+
+
+
+
+
+
++-------------------------------------------------------------------------------------------------------------------------+
+|                               EXPANSION: PHASE 4 - GENERATE DETAILED REPORT                                             |
++-------------------------------------------------------------------------------------------------------------------------+
+
+      [ FROM STAGE 3 (License Check Complete) ]
+                   |
+                   v
++=======================================================================================================================+
+|  SECTION A: THE "PASS" REGISTER (GREEN)                                                                               |
+|  "Confirmation of what is working correctly."                                                                         |
++=======================================================================================================================+
+|                                                                                                                       |
+|  [ 1. IDENTITY CONFIRMATION ]                                                                                         |
+|    • Tool Type matched CPoint (1:1).                                                                                  |
+|    • PC Hardware Identity verified.                                                                                   |
+|                                                                                                                       |
+|  [ 2. SOFTWARE INVENTORY ]                                                                                            |
+|    • List of all verified applications (CFS, AcuShape, Nexus, etc.).                                                  |
+|    • Include: Actual Version Found vs. Target Version.                                                                |
+|                                                                                                                       |
+|  [ 3. LICENSE AUDIT ]                                                                                                 |
+|    • List of all validated licenses.                                                                                  |
+|    • Confirmation of "No Overflow" (Clean machine).                                                                   |
+|                                                                                                                       |
++=======================================================================================================================+
+                   |
+                   v
++=======================================================================================================================+
+|  SECTION B: THE "ISSUE" REGISTER (RED/AMBER)                                                                          |
+|  "Actionable items that block delivery."                                                                              |
++=======================================================================================================================+
+|                                                                                                                       |
+|  [ 1. UNPASSED CHECKS (FAILURES) ]                                                                                    |
+|    • HARDWARE MISMATCH: (e.g., Wrong PC type).                                                                        |
+|    • SOFTWARE MISMATCH: (e.g., Wrong version of MEC FW).                                                              |
+|       -> Detail: "Expected [X], Found [Y]".                                                                           |
+|                                                                                                                       |
+|  [ 2. MISSING LICENSES (PENDING) ]                                                                                    |
+|    • List of licenses currently missing.                                                                              |
+|    • STATUS: "Email Sent to Support" (Timestamp).                                                                     |
+|                                                                                                                       |
+|  [ 3. OVERFLOW ITEMS (WARNINGS) ]                                                                                     |
+|    • List of items found on machine but not in Order.                                                                 |
+|    • STATUS: "Marked for Removal" or "Requires Investigation".                                                        |
+|                                                                                                                       |
++=======================================================================================================================+
+                   |
+                   v
++=======================================================================================================================+
+|  SECTION C: AUTOMATED TICKET GENERATION                                                                               |
+|  "Connecting the findings to the support workflow."                                                                   |
++=======================================================================================================================+
+|                                                                                                                       |
+|  [ 1. RDM TICKETS ]                                                                                                   |
+|    • TRIGGER: If RDM was required but missing (Stage 1).                                                              |
+|    • OUTPUT: Ticket ID created in system.                                                                             |
+|                                                                                                                       |
+|  [ 2. CONFIGURATION TICKETS ]                                                                                         |
+|    • TRIGGER: Critical mismatch in Tool Type or Identity.                                                             |
+|                                                                                                                       |
++=======================================================================================================================+
+                   |
+                   v
++=======================================================================================================================+
+|  SECTION D: FINAL ARTIFACTS                                                                                           |
+|  "Evidence for the customer/records."                                                                                 |
++=======================================================================================================================+
+|                                                                                                                       |
+|  [ 1. SNAPSHOTS ]                                                                                                     |
+|    • Photos/Screenshots taken during the process (if visual inspection logic included).                               |
+|                                                                                                                       |
+|  [ 2. LOG FILES ]                                                                                                     |
+|    • Full `ver.txt` copy.                                                                                             |
+|    • Full `lmtool.txt` dump.                                                                                          |
+|                                                                                                                       |
+|  [ 3. STATUS VERDICT ]                                                                                                |
+|    • FINAL RESULT: [ PASS ] / [ CONDITIONAL PASS ] / [ FAIL ]                                                         |
+|                                                                                                                       |
++=======================================================================================================================+
+
+
+

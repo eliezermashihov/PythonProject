@@ -1,0 +1,52 @@
+\\isr1nas03\Fast1\Customer_Acceptance\58-CFP\Procedures\Pre-Physical
+
+handler software - \\klasj\ktfiles\Regions\Israel\Ops\KTI-Material-Group\Master_Planning_Group\Configuration\Handlers Tracking
+
+golden ca - \\isr1nas03\Fast1\Customer_Acceptance\00-Golden CA folder
+
+feature 
+klasj\autologonuser
+password: Columbia03
+
+Hi all
+Summary of the Pre-Physical:
+1. Handler’s PC – WIN7/WIN10/BFEM
+2. SW verification – PASS
+CA Owner needs to verify Handler SW post CA phase. @DL-CA-Film
+3. Licenses – PASS
+4. HW and Optics – PASS
+5. Labels – PASS
+6. Interlock check– PASS
+7. Cameras’ FOV – PASS
+8. Ref. Chip Visual & Thickness inspection – PASS
+9. Grating Visual Inspection – PASS
+10. Encoders – PASS
+11. Light tower – PASS
+12. Bay Status – Clean
+13. Cosmetic issues – PASS
+14. eQuality – FAIL
+15. Baseline – Need
+ 
+Hi all ,
+Summary of the Pre-Physical: \\isr1nas03\FSFast5\FaST_Database\40xx-4099\4062-SF 8660-UMC\2-Golden_Customer_Acceptance\4-Pre-Phy…
+1. Handler’s PC – WIN7/WIN10/BFEM
+2. SW verification – PASS
+CA Owner needs to verify Handler SW post CA phase. @DL-CA-Film
+Need to install FH - @Biton, Daniel
+3. Licenses – PASS
+4. HW and Optics – PASS
+5. Labels – PASS
+6. Interlock check– PASS
+7. Cameras’ FOV – FAIL
+750 CAMERA FAILED – PICTURES ATTACHED @Ben Zaken, Moshe
+@Wiegner, Yonatan PLEASE ADVISE
+8. Ref. Chip Visual & Thickness inspection – PASS
+9. Grating Visual Inspection – PASS
+10. Encoders – PASS
+11. Light tower – PASS
+12. Bay Status – Clean
+13. Cosmetic issues – PASS
+Panels are jig panels. @Ben Zaken, Moshe please replace.
+14. eQuality – PASS
+15. Baseline – Need @Fux, Adi @Nachmani, Ben
+ 

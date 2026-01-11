@@ -1,0 +1,78 @@
+Defining the software phase:
+
+Measurements from the compatibility matrix:
+
+Software: cfp assistant - daniel biton. Software is in Adi’s computer.
+
+We take the configuration of the machine / tool from cpoint.
+The items in cpoint are the tools -> we need to verify the data on cpoint.
+
+CFS - common film shape software
+RDM - indicator - if exists in cpoint then check if it is on the machine through rdm_ver.txt in the cmd. If there is rdm in cpoint and no rdm in the tool, then rise a ticket for issue.
+Customer - not interesting
+Tool_type - take from cpoint, the accurate measure
+Tool_name
+Op. system - either windows 7 or windows 10
+Pc - has to be identical to the tool itself
+Cfs - has to be identical
+Acushape - has to be 1:1 identical (its from the tool, we compare to compatibility matrix)
+
+Who built cpoint: hen shimoni חן שמעוני
+
+FTML - compare from tool by the Atlas software
+
+In the machine there is a ver.txt file
+
+The ver.txt file in the machine - all the versions are in there, we can extract from this .txt file the cfs, or from Atlas (under the version field).
+
+Next: additional software,if it is in cpoint in the notes A/notes B,
+	Written the name + version, then find on the machine and verify on it (that it isn’t N/A)
+All the versions in KTPatchViewer - all the versions of nexus in the tool, under 2 or 3 items, nexus client1 / nexus client 2 / nexus server
+—-------> we can extract from program files somehow this relevant information.
+
+Nexus- Shechter David שכטר דוד.
+
+FleetHub - verify: 1. Exists, 2. Running (not disabled, failed or not enrolled)
+—---> Daniel Biton
+
+MEC - FW RzMP - compare with eXMP, extract from the format of the KLA software - after the string MEC FW the version in the About and compare with the matrix.
+
+
+SMCB FW NIOS - in the matrix, also compare.
+
+SQL Validation - only if there is Windows 10. Above version >= 14.0.3456.2 (check procedure in the folder, if we can automate this validation).
+
+Acushape is installed only on the NLB (but documented on both the main computer on the ver.txt file) and in the NLR in the C/AcuShape/version_new.txt
+
+Licenses - Under Mcdb
+
+Go through and compare 1:1 in mcdb that licenses in cpoint are matching.
+If there is overflow in mcdb - REMOVE what is not on CPOINT. (or advise needing to remove).
+—>> either a license is missing (that is on cpoint)
+—> either there is overflow of licenses (that are not on cpoint) that are on the tool.
+—> maybe there is a demo license that shouldnt be there
+
+The comparison is not done 1:1 in string level, for example FDC and something else way longer.
+→ if it is a package - then it opens to a list of detailed licenses that has to be installed
+→ you need all the packages - unpack them and use them for comparison
+
+TALK WITH:
+Ronen Golan
+Alin Fimlnik
+Raz Ben Nasan
+
+License - you can extract under “Atlas_…” “Atlas_cd” and so forth.
+
+All the licenses are in mcdb, but technically you can find them in search of .ktlic files in the C drive, and check if the tool number is there, if not, you usually REMOVE ON THE SPOT?
+Those are files with format and structure that you can extract licenses by name and compare and check (and therefore comparison with cpoint with the help of those files)
+
+Feature:
+Given a problem (“missing license”) - > send an email to the relevant three people with the credentials of the tool (UTID, customer, tool type MAC address, SW version) + a request for the relevant licenses + the lmtool.txt or lmutil.txt file, they have to have it.
+
+If there is a fix - you install manually - then run the validation again.
+איגור מיליאבסקי Igor Miliavski -
+Made a software to validate licenses and shit, check out with him a little
+
+The order of checking the parameters is by the procedure and the
+Auto Remote app - you can access the right folder on the tool (and they files) without fully logging in (necessairly) to the tool.
+
