@@ -1,0 +1,78 @@
+
+
+
+Modularity
+Design modules so they can be developed, tested, and maintained independently without affecting other parts.
+Minimality of lines of code
+Full functionality
+Ability to trace back errors
+Explainability of the code
+No duplication of code
+Compatability between different parts of code
+Easily changable code
+Future updatable and editble code
+Not using complex data structures
+Not using complex libraries
+Not importing too many dependencies
+Ability to represent the codebase as a diagram that clearly explains itself
+Explicit role and responsibility distribution in the code
+The code should implement a goal, and not be bloated with useless purposed of code
+There should be explicit function calls whenever specific actions are needed to be done, to allow interpretability of the code
+Do not add features or abstractions that are not required for the current goal.
+Simplicity should always take priority over hypothetical future needs.
+When facing a complex problem, divide it into smaller, manageable units. Each unit should be easy to understand and maintain.
+Each module or unit should only interact with closely related components.
+Define explicit boundaries between layers (e.g., presentation, logic, data). Avoid leaking implementation details across layers.
+Avoid unnecessary coupling between distant parts of the system.
+Minimize dependencies between different concerns to allow flexibility and easier refactoring.
+Functions and classes should only call or depend on components that are directly relevant to their role. Do not create long dependency chains.
+Each unit should have limited knowledge about other units.
+Keep interfaces clear and avoid exposing internal details unnecessarily.
+If the same logic is needed in multiple places, extract it into a shared function, class, or module instead of rewriting it.
+Writing everything twice (WET) wastes time and increases maintenance complexity. Always refactor repetitive code into reusable components.
+Ensure that any data or configuration is defined in one place only, so changes propagate consistently across the system.
+Use abstraction techniques (functions, classes, templates) to eliminate redundancy while keeping the code understandable.
+Don’t introduce layers, patterns, or generic solutions before duplication or complexity actually warrants them.
+Don’t implement features, abstractions, or logic until they are explicitly required by current requirements.
+Avoid writing code “for future possibilities.” Only build what is needed now to meet the concrete goal.
+Keep function/class interfaces minimal; add parameters or capabilities only when a real use case emerges.
+Regularly delete scaffolding, placeholders, and code paths that are not actively used.
+Avoid premature optimization. Optimize only where a measured bottleneck exists.
+Use the current specification or user story as the source of truth. If it’s not in scope, don’t build it.
+Start simple and evolve the design as needs arise—refactor when new requirements demonstrate the necessity.
+Prefer small, specific interfaces over large, general ones. Clients should not be forced to depend on methods they do not use.
+Define clear roles for each unit; avoid “god classes” or “utility catch-alls.”
+Introduce interfaces/ports for external systems (DB, network, filesystem); inject implementations at the edges.
+Ensure that each part of the system focuses on one concern (e.g., UI, business logic, data persistence) without mixing unrelated logic.
+When concerns are well-separated, components become easier to reuse in other contexts.
+Readable, maintainable code is more valuable than marginal speed gains early in development.
+A class or function should only call methods of: 1. Itself 2.Its direct components 3. Objects passed as parameters 4. Objects it creates
+Do not chain multiple calls like a.getB().getC().doSomething(). This creates tight coupling and breaks encapsulation.
+Each unit should know as little as possible about the internal structure of other units. Keep interfaces clean and abstract.
+Adopt practices like Test-Driven Development (TDD) to ensure code correctness from the start.
+Use unit tests, integration tests, and continuous testing pipelines to catch issues before production.
+Write clear, traceable code with meaningful logs and error messages to simplify troubleshooting.
+Prioritize finding bugs during development rather than after deployment to reduce cost and complexity.
+The development should be incremental, so that we write the code for screen after screen. We write the code for module after module.
+
+
+==========================================================================================================
+    We should design a functional MVP (first screen) for presentation and feel
+==========================================================================================================
+
+==========================================================================================================
+    We should then lay down the foundations of the code of the app, start with UI wise, then continue to logic breakdown and flow
+==========================================================================================================
+
+==========================================================================================================
+    We should design a dys-functional UI interface for pages of the app (first screen - second screen - third screen - fourth screen)
+==========================================================================================================
+
+==========================================================================================================
+    We should draw inspiration from Inon UI of his app / Generally - advised by the users in the meeting, Inam, Ben, Adi, etc.
+==========================================================================================================
+
+==========================================================================================================
+    WE NEED TO BUILD THE CODE WITH RESPECT TO THE FLOW OF THE FLOWCHART, AND DIVISION TO SCREENS BY STAGES
+    The flow should be just like the flowchart, from action to action, from decision to decision.
+==========================================================================================================
